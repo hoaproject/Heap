@@ -23,13 +23,16 @@
 [![Documentation](https://img.shields.io/badge/documentation-hack_book-ff0066.svg)](https://central.hoa-project.net/Documentation/Library/Heap)
 [![Board](https://img.shields.io/badge/organisation-board-ff0066.svg)](https://waffle.io/hoaproject/heap)
 
-This library is an implementation of Heap data structure priority queue.
-The order of heap depends on priority parameter.
-This is the difference with `SplHeap` is that you control the integer used to compare the order of items.
-Giving you the support of using item type *Scalar*, *Array*, *Object* or *Closure*
+This library is an implementation of Heap data structure priority
+queue. The order of heap depends on priority parameter. The
+difference with [`SplHeap`](http://php.net/class.splheap) is that you
+control the integer used to compare the order of items.  Giving you
+the support of using item type *Scalar*, *Array*, *Object* or
+*Closure*
 
-`Hoa\Heap\Min` and `Hoa\Heap\Max` class interpret priority by comparing priority numerically.
-But you are free to implement your own class if you want a different sort algorithm.
+`Hoa\Heap\Min` and `Hoa\Heap\Max` class interpret priority by
+comparing priority numerically.  But you are free to implement your
+own class if you want a different sort algorithm.
 
 ## Installation
 
@@ -62,8 +65,11 @@ For more information, please read the [contributor
 guide](https://hoa-project.net/Literature/Contributor/Guide.html).
 
 ## :information_source: Information
-The default iteration process (through _foreach_ or _next_) do not dequeue the Heap as `SplHeap` does.
-If you want this behavior, you must use Generator methods `top` or `pop` for iterate while removing the item from a heap.
+
+The default iteration process (through _foreach_ or _next_) do not
+dequeue the Heap as `SplHeap` does.  If you want this behavior, you
+must use Generator methods `top` or `pop` for iterate while removing
+the item from a heap.
 
 ## Quick usage
 
@@ -80,7 +86,7 @@ In first, we will create our callbacks process.
 
 ```php
 // First method used to check if phone number is correct.
-$check = function($phone) {
+$check = function ($phone) {
     if (1 !== preg_match('/^\+?[0-9]+$/', $phone)) {
         throw new \Exception('Phone number not conform.');
     }
@@ -89,29 +95,29 @@ $check = function($phone) {
 };
 
 // Second method used to convert number into object.
-$transform = function($phone) {
-    return (object)[
+$transform = function ($phone) {
+    return (object) [
         'prefix'  => '+33',
         'country' => 'France',
-        'number'  => $phone,
+        'number'  => $phone
     ];
 };
 
 // Third method used to display formatted number.
-$format = function(\StdClass $phone) {
-    return $phone->prefix
-        . ' '
-        . wordwrap($phone->number, 3, ' ', true)
-    ;
+$format = function (\StdClass $phone) {
+    return
+        $phone->prefix .
+        ' ' .
+        wordwrap($phone->number, 3, ' ', true);
 };
 ```
 
 ### Create and fill Heap
 
-Creation of our Heap with minimum priority Ascending ( lower called first ).
+Creation of our Heap with minimum priority Ascending (lower called first).
 
 ```php
-$heap = new \Hoa\Heap\Min();
+$heap = new Hoa\Heap\Min();
 
 // Insert the callback method with the priority argument used for order Heap.
 $heap->insert($transform, 20);
@@ -158,8 +164,8 @@ var_dump($number);
 
 ## Documentation
 
-The [hack book of
-`Hoa\heap`](https://hoa-project.net/Literature/Hack/heap.html) contains
+The
+[hack book of `Hoa\Heap`](https://hoa-project.net/Literature/Hack/Heap.html) contains
 detailed information about how to use this library and how it works.
 
 To generate the documentation locally, execute the following commands:
@@ -191,7 +197,7 @@ everything you need to know.
 Hoa is under the New BSD License (BSD-3-Clause). Please, see
 [`LICENSE`](https://hoa-project.net/LICENSE) for details.
 
-## Related projects
+## Related project:s
 
 There are no related project registered, Let us know by opening issue
 if you use it and want be listed!
