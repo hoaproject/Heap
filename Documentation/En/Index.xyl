@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<overlay xmlns="http://hoa-project.net/xyl/xylophone">
+<yield id="chapter">
+<p>As a quick overview, we propose to see a simple use case with a Phone number processing.
+ It must be sent to three methods in a strict order, <strong>Check</strong>, <strong>Transform</strong>, <strong>Format</strong>.</p>
+
+<p>Let's assume we don't have access to iteration process. (Like callback stack existing in Hoa\Event)
+ But we can sort in which orders our methods must be called for respect our process.</p>
+
+<h2 id="Table_of_contents">Table of contents</h2>
+<tableofcontents id="main-toc" />
+
+<h2 id="Register" for="main-toc">Register Callback</h2>
+<p>In first, we will create our callbacks process by registering 3 closure.</p>
+
+<ol>
+  <li>First method used to check if phone number is correct.</li>
+  <li>Second method used to convert number into object.</li>
+  <li>Third method used to display formatted number.</li>
+</ol>
+
+<pre><code class="language-php">
+// 1. Checker callback
+$check = function ($phone) {
+    if (1 !== preg_match('/^\+?[0-9]+$/', $phone)) {
+        throw new \Exception('Phone number not conform.');
+    }
+
+    return $phone;
+};
+
+// 2. Transformation callback
+$transform = function ($phone) {
+    return (object) [
+        'prefix'  => '+33',
+        'country' => 'France',
+        'number'  => $phone
+    ];
+};
+
+// 3. Formatter callback
+$format = function (\StdClass $phone) {
+    return
+        $phone->prefix .
+        ' ' .
+        wordwrap($phone->number, 3, ' ', true);
+};
+</code></pre>
+
+<h2 id="Fill" for="main-toc">Create and fill Heap</h2>
+<p>Creation of our Heap with minimum priority Ascending (lower called first).</p>
+
+<pre><code class="language-php">
+$heap = new Hoa\Heap\Min();
+
+// Insert the callback method with the priority argument used for order Heap.
+$heap->insert($transform, 20);
+$heap->insert($check, 10);
+$heap->insert($format, 30);
+
+// Show the number of item in Heap.
+var_dump(
+    $heap->count()
+);
+
+/**
+ * Will output:
+ *     int(3)
+ */
+</code></pre>
+
+
+<h2 id="Iteration" for="main-toc">Iteration Heap</h2>
+
+<p>Then we can iterate on our <strong>Heap</strong> with assurance of correct call order.
+Spread your number into closure and have process mutation expected.</p>
+
+<pre><code class="language-php">
+// Phone number as expected by first callback.
+$number = '123001234';
+
+foreach ($heap as $closure) {
+    try {
+        // Mutation of number by closure, execute in the priority order expected.
+        $number = $closure($number);
+    } catch (\Exception $e) {
+        break;
+    }
+}
+
+// Finally, we can display our formatted number.
+var_dump($number);
+
+/**
+ * Will output:
+ *     string(15) "+33 123 001 234"
+ */
+</code></pre>
+
+</yield>
+</overlay>
