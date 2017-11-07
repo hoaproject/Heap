@@ -73,92 +73,70 @@ the item from a heap.
 
 ## Quick usage
 
-As a quick overview, we propose to see a simple use case with
- a `Phone number`, This phone number must be sent to three methods 
- in a strict order, `Check`, `Transform`, `Format`.
- 
- Let's assume we don't have access to iteration process. (Like callback stack existing in Hoa\Event)
- But we can sort in which orders our methods must be called for respect our process. 
+As a quick overview, we propose to see two simple use cases.
 
-### Register Callback
+### Min-Heap
 
-In first, we will create our callbacks process.
-
-```php
-// First method used to check if phone number is correct.
-$check = function ($phone) {
-    if (1 !== preg_match('/^\+?[0-9]+$/', $phone)) {
-        throw new \Exception('Phone number not conform.');
-    }
-
-    return $phone;
-};
-
-// Second method used to convert number into object.
-$transform = function ($phone) {
-    return (object) [
-        'prefix'  => '+33',
-        'country' => 'France',
-        'number'  => $phone
-    ];
-};
-
-// Third method used to display formatted number.
-$format = function (\StdClass $phone) {
-    return
-        $phone->prefix .
-        ' ' .
-        wordwrap($phone->number, 3, ' ', true);
-};
-```
-
-### Create and fill Heap
-
-Creation of our Heap with minimum priority Ascending (lower called first).
+Find a minimum item of a min-heap while retrieving priority value.
 
 ```php
 $heap = new Hoa\Heap\Min();
 
-// Insert the callback method with the priority argument used for order Heap.
-$heap->insert($transform, 20);
-$heap->insert($check, 10);
-$heap->insert($format, 30);
+$heap->insert('Laps 1', 15);
+$heap->insert('Laps 2', 18);
+$heap->insert('Laps 3', 8);
 
-// Show the number of item in Heap.
-var_dump(
-    $heap->count()
-);
+foreach($heap as $laps) {
+    $priority = $heap->priority();
+    echo " > $laps in $priority seconds\n";
+}
+
+/**
+ * Will output:
+ *     > Laps 3 in 8 seconds
+ *     > Laps 1 in 15 seconds
+ *     > Laps 2 in 18 seconds
+ */
+```
+
+### Max-Heap with Generator
+
+Find a maximum item of a max-heap and dequeue iteration (a.k.a. peek)
+
+```php
+// 1. Create an empty heap 
+$heap = new Hoa\Heap\Max();
+
+// 2. Adding new item with a priority integer to the heap
+$heap->insert('Jane', 305);
+$heap->insert('Paul', 344);
+$heap->insert('Helen', 234);
+
+var_dump($heap->count());
 
 /**
  * Will output:
  *     int(3)
  */
-```
 
-### Iteration Heap
-
-Then we can iterate on our `Heap` with assurance of correct call order.
-Spread your number into closure and have process mutation expected.
-
-```php
-// Phone number as expected by first callback.
-$number = '123001234';
-
-foreach ($heap as $closure) {
-    try {
-        // Mutation of number by closure, execute in the priority order expected.
-        $number = $closure($number);
-    } catch (\Exception $e) {
-        break;
-    }
+// 3. dequeue the heap with item of maximum value
+foreach($heap->top() as $name) {
+    echo " > $name\n";
 }
-
-// Finally, we can display our formatted number.
-var_dump($number);
 
 /**
  * Will output:
- *     string(15) "+33 123 001 234"
+ *     > Paul
+ *     > Jane
+ *     > Helen
+ */
+
+// 4. Constat the heap is now empty after iteration on top generator
+var_dump($heap->count());
+
+/**
+ * Will output:
+ *     int(0)
  */
 ```
 
